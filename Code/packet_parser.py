@@ -37,4 +37,4 @@ def parse() :
 		nodeArray.append(packetArray)
 	print(nodeArray)
 	return(nodeArray) #array formatted 'NODENUMBER, PACKETNUMBER, TIME, SRC, DEST, PROTOCOL, LEN, ID, SEQNUM(LE/BE), TTL, TYPE, PAIRING'
-parse() #for debug	
+# parse() #for debug	
