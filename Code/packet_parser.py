@@ -8,7 +8,7 @@ def opener(directory):
 			fileArray.append(f)
 	return(fileArray)
 
-def hexreader(file):
+def reader(file):
 	print('filename: ' + file)
 	node = open(file, 'r')
 	lines = node.readlines()
@@ -20,11 +20,11 @@ def hexreader(file):
 
 def parse() :
 	print('called parse function in packet_parser.py')
-	files = opener('Captures')
+	files = opener('./Captures')
 	nodeArray = []
 	nodeNumber = 1
 	for file in files: #node
-		packetData = hexreader(file)
+		packetData = reader(file)
 		packetArray=[]
 		for packet in packetData:
 			packetDataArray = [("N"+str(nodeNumber))]
@@ -35,6 +35,5 @@ def parse() :
 			packetArray.append(packetDataArray)
 		nodeNumber += 1
 		nodeArray.append(packetArray)
-	print(nodeArray)
-	return(nodeArray) #array formatted 'NODENUMBER, PACKETNUMBER, TIME, SRC, DEST, PROTOCOL, LEN, ID, SEQNUM(LE/BE), TTL, TYPE, PAIRING'
-# parse() #for debug	
+	# print(nodeArray) #for debug
+	return(nodeArray) #array formatted [[[NODENUMBER 1, PACKETNUMBER, TIME, SRC, DEST, PROTOCOL, LEN, ID, SEQNUM(LE/BE), TTL, TYPE, PAIRING][...]][[2...][...]][[...][...]]] (its a 3d array separated in to node groups where each node group is full of arrays the correspond to packets)
