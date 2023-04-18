@@ -20,7 +20,8 @@ def reader(file):
 
 def parse() :
 	print('called parse function in packet_parser.py')
-	files = opener('./Captures')
+	files = opener('PCAP-Tool/Captures')
+	files.sort(reverse=True)
 	nodeArray = []
 	nodeNumber = 1
 	for file in files: #node
