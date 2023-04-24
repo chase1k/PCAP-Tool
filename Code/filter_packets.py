@@ -28,12 +28,12 @@ def filter():
 def filta(file, newFile, line):
 
 	while line:
-		if line.__contains__('Echo'):
+		if 'Echo' in line:
 			newFile.write("No.     Time           Source                Destination           Protocol Length Info\n")
 
 			while line:
 
-				print(line)
+				# print(line)
 				newFile.write(line)
 				line = file.readline()	
 
