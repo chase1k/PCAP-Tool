@@ -32,7 +32,7 @@ def reader(file):
 
 def parse() :
 	print('called parse function in packet_parser.py')
-	files = opener('Captures')
+	files = opener('../Captures')
 	files.sort(reverse=True) #reverse order the files (does not have to be reverse)
 	nodeArray = [] # array of nodes
 	nodeNumber = 1
@@ -52,4 +52,8 @@ def parse() :
 		nodeNumber += 1
 		nodeArray.append(packetArray) # append it all to the final return  (3d)
 	# print(nodeArray) #for debug
+	
+	# Reverse the list grrrr
+	nodeArray.reverse()
+
 	return(nodeArray) #array formatted [[[NODENUMBER 1, PACKETNUMBER, TIME, SRC, DEST, PROTOCOL, LEN, ID, SEQNUM(LE/BE), TTL, TYPE, PAIRING, [RAW HEX DATA]][...]][[2...][...]][[...][...]]] (its a 3d* array separated in to node groups where each node group is full of arrays the correspond to packets, the asterisk is because with the HEX data added its technically a 4D array)
