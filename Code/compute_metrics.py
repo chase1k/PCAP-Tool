@@ -2,17 +2,17 @@
 NODE_IPS = ["192.168.100.1", "192.168.100.2", "192.168.200.1", "192.168.200.2"]
 
 
-def calculate_rtt(list):
+def calculate_rtt(list, node_ip):
 	total_delay = 0
 	ping_count = 0
 	for i in range(0, len(list)):
-		packet = list[i]
-		if 'request' in packet[10]:
+		packet = list[i][0:12]
+		if 'request' in packet[10] and packet[3] == node_ip:
 			reply_id = int(packet[11].split(' ')[2])
 			
 			# Search forward until ID is found
 			for reply_i in range(i, len(list)):
-				reply_packet = list[reply_i]
+				reply_packet = list[reply_i][0:12]
 				if int(reply_packet[1]) == reply_id:
 					break
 				else:
@@ -20,29 +20,37 @@ def calculate_rtt(list):
 			
 			# Calculate delay
 			delta = float(reply_packet[2]) - float(packet[2])
-			total_delay += delta
+			total_delay += delta*1000 # Make into ms
 			ping_count += 1
 
-	average_delay = (total_delay/ping_count)*1000
+	average_delay = (total_delay/ping_count)
+	return(average_delay,total_delay)
+
+
+def calculate_reply_delay(list, node_ip):
+	total_delay = 0
+	count = 0
+	for i in range(0, len(list)):
+		packet = list[i][0:12]
+		if 'reply' in packet[10] and packet[3] == node_ip:
+			request_id = int(packet[11].split(' ')[2])
+			
+			# Search backward until ID is found
+			for request_i in range(i, 0, -1):
+				request_packet = list[request_i][0:12]
+				if int(request_packet[1]) == request_id:
+					break
+				else:
+					continue
+			
+			# Calculate delay
+			delta = float(packet[2]) - float(request_packet[2])
+			total_delay += delta*1000000 # Make into us
+			count += 1
+		
+	average_delay = (total_delay/count)
 	return(average_delay)
 
-
-
-def calculate_data_rate(list, offset=0):
-	total_data = calculate_bytes(list, offset)
-	
-	# Find Time Delta
-	t1 = float(list[0][2])
-	t2 = float(list[len(list)-1][2])
-	delta = t2 - t1
-
-	# Rate
-	rate = total_data / delta
-	return(rate)
-
-
-def calcuate_reply_delay():
-	pass
 
 def calculate_hop_count():
 	pass
@@ -96,17 +104,21 @@ def compute_node_stats(packets, node_ip):
 	print(f"Echo Requests Recived: {len(echo_req_recv)}")
 	print(f"Echo Replies Sent: {len(echo_reply_sent)}")	
 	print(f"Echo Replies Recieved: {len(echo_reply_recv)}")
-	print(f"Echo Requests Bytes Sent : {calculate_bytes(echo_req_sent, 0)}")
-	print(f"Echo Requests Bytes Recieved : {calculate_bytes(echo_req_recv, 0)}")
-	print(f"Echo Requests Data Sent : {calculate_bytes(echo_req_sent, 42)}")
-	print(f"Echo Requests Data Recieved : {calculate_bytes(echo_req_recv, 42)}")
+	print(f"Echo Requests Bytes Sent: {calculate_bytes(echo_req_sent, 0)}")
+	print(f"Echo Requests Bytes Recieved: {calculate_bytes(echo_req_recv, 0)}")
+	print(f"Echo Requests Data Sent: {calculate_bytes(echo_req_sent, 42)}")
+	print(f"Echo Requests Data Recieved: {calculate_bytes(echo_req_recv, 42)}")
 	
 	
 	# Calcuate Other Stats
-	print(f"\nAverage RTT (ms) : {calculate_rtt(packets):.2f}")
-	print(f"Echo Request Throughput : {calculate_data_rate(echo_req_sent) + calculate_data_rate(echo_req_recv):.2f}")
-	print(f"Echo Request Goodput : {calculate_data_rate(echo_req_sent, 42) + calculate_data_rate(echo_req_recv, 42):.2f}")
-	print(f"Average Reply Delay : NULL")
+	rtt = calculate_rtt(packets, node_ip) # returns (average, total)
+	print(f"\nAverage RTT (ms): {rtt[0]:.2f}")
+	throughput = calculate_bytes(echo_req_sent, 0) / rtt[1]
+	print(f"Echo Request Throughput (kB/sec): {throughput:.1f}")
+	goodput = calculate_bytes(echo_req_sent, 42) / rtt[1] 
+	print(f"Echo Request Goodput (kB/sec): {goodput:.1f}")
+	reply_delay = calculate_reply_delay(packets, node_ip)
+	print(f"Average Reply Delay (us): {reply_delay:.2f}")
 
 	# Calculate Hop Count
 	print(f"\nAverage Echo Request Hop Count : NULL")
