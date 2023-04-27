@@ -140,9 +140,6 @@ def compute(node_packets) :
 
 	# Open File
 	f = open("metrics.csv", "w")
-
-	print('called compute function in compute_metrics.py')
-	
 	# For each node pass in packets and IP of node
 	for node in range(0, len(node_packets)):
 		f.write(f"Node {node+1}\r\n\r\n")
