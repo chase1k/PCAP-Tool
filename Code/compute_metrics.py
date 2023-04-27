@@ -130,7 +130,11 @@ def compute_node_stats(packets, node_ip, f):
 	f.write(f"Echo Request Goodput (kB/sec),{goodput:.1f}\r\n")
 	f.write(f"Average Reply Delay (microseconds),{reply_delay:.2f}\r\n")
 	f.write(f"Average Echo Request Hop Count,{hop_count:.2f}\r\n\r\n")
-	
+
+	# Print one packet to show hex is being parsed
+	# See "packet_parser.py" for more details
+	if node_ip == NODE_IPS[3]:
+		print(f"Example Packet for Hex Parsing : {packets[0]}")	
 		
 
 # Node Packets contains an array for each node. In that array is an an array of packets.
